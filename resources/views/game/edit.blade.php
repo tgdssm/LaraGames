@@ -12,6 +12,9 @@
                         {{ method_field('PUT') }}
 
                         @include('game.form')
+                        
+                        <a href="{{ route('game.show', $game->id) }}" class="btn btn-outline-danger d-inline">Cancelar</a>
+
                     </form>
                 </div>
             </div>

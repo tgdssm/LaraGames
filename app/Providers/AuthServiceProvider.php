@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Game;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -24,7 +25,9 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
-
-        //
+        
+        Gate::define('administrator', function($user){
+            return $user->type == 'administrator';
+        });
     }
 }

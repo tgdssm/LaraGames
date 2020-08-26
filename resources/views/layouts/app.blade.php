@@ -64,9 +64,12 @@
                                 </li>
                             @endif
                         @else
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('game.create') }}">{{ __('Cadastrar Jogo') }}</a>
-                            </li>
+                        @can('administrator', User::class)
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('game.create') }}">{{ __('Cadastrar Jogo') }}</a>
+                        </li>
+                        @endcan
+                            
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Str::upper(Auth::user()->nickname) }} <span class="caret"></span>
@@ -86,15 +89,20 @@
                             </li>
                         @endguest
                     </ul>
+                    <form action="{{ route('game.search') }}" method="POST" class="form form-inline ml-3">
+                        @csrf
+                        <input type="text" name="filter" placeholder="Procurar Jogo" class="form-control">
+                        <button type="submit" class="btn btn-outline-primary ml-1">Pesquisar</button>
+                    </form>
                 </div>
             </div>
         </nav>
 
         <br>
-        @if (session('alertlogin'))
+        @if (session('recommendation'))
         <div class="container w-50 d-flex justify-content-center">
-            <div class="alert alert-warning">
-                {{ session('alertlogin') }}
+            <div class="alert alert-success">
+                {{ session('recommendation') }}
             </div>
         </div>
             

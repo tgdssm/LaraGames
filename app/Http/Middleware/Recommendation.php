@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
-class AlertLogin
+class Recommendation
 {
     /**
      * Handle an incoming request.
@@ -20,7 +20,7 @@ class AlertLogin
 
         if(! Auth::check())
         {
-            $request->session()->flash('alertlogin', 'Faça login para indicar novos jogos');
+            $request->session()->flash('recommendation', 'Você pode indicar novos jogos na área de comentários.');
         }
 
         return $response;

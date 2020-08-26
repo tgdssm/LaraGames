@@ -4,16 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Game;
-use App\Http\Requests\GameRequest;
+use App\Http\Requests\{
+    GameRequest,
+    UpdateGameRequest,
+};
 use Validator;
+use App\User;
+use DB;
 
 
 class GameController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('alertlogin');
-        $this->middleware('auth')->except('index', 'show');
+        $this->middleware('recommendation');
+        $this->middleware('auth')->except('index', 'show', 'search');
     }
     /**
      * Display a listing of the resource.
@@ -22,7 +27,7 @@ class GameController extends Controller
      */
     public function index()
     {
-        $games = Game::get();
+        $games = Game::paginate(3);
         return view('game.index', compact('games'));
     }
 
@@ -33,6 +38,7 @@ class GameController extends Controller
      */
     public function create()
     {
+        $this->authorize('administrator', User::class);
         return view('game.create');
     }
 
@@ -83,6 +89,7 @@ class GameController extends Controller
     public function edit($id)
     {
         $game = Game::findOrFail($id);
+        $this->authorize('administrator', User::class);
         return view('game.edit', compact('game'));
     }
 
@@ -93,19 +100,10 @@ class GameController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateGameRequest $request, $id)
     {
         $game = Game::find($id);
-
-        Validator::make($request->all(), [
-            'name' => ['required', 'string', 'min:3', 'max:200'],
-            'genre' => ['string', 'min:3', 'max:100'],
-            'description' => ['required', 'min: 10'],
-            'language' => ['min:2'],
-            'size' => ['required', 'min:1', 'max:10'],
-            'release' => ['integer'],
-            'platform' => ['required'],
-        ])->validate();
+        $this->authorize('administrator', User::class);
 
         $game->name = $request->name;
         $game->release = $request->release;
@@ -114,11 +112,13 @@ class GameController extends Controller
         $game->language = $request->language;
         $game->platform = $request->platform;
         $game->size = $request->size;
+
         if($request->hasFile('photo'))
             $game->photo = $request->photo->store('public');
         
         if($request->hasFile('torrent'))
             $game->torrent = $request->torrent->store('public');
+
         $game->save();
 
         return redirect()->route('game.index');
@@ -132,6 +132,18 @@ class GameController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $game = Game::find($id);
+        $this->authorize('administrator', User::class);
+
+        if ($game->delete())
+            return redirect()->route('game.index');
+    }
+
+    public function search(Request $request)
+    {
+        
+
+        $games = DB::table('games')->where('name', 'LIKE', "%{$request->filter}%")->paginate();
+        return view('game.index', compact('games'));
     }
 }

@@ -14,8 +14,15 @@
                 </div>
             </div>
         </div>
+        <br>
+        
     </div><br>
     @empty
-        <p>nenhum jogo registrado</p>
+    <div class="container col-md-6 bg-white d-flex justify-content-center align-items-center" style="height: 500px; border-radius: 5px;">
+        <h1>NENHUM JOGO ENCONTRADO</h1>
+    </div>
     @endforelse
+    <div class="container d-flex justify-content-center align-items-center">
+        {!! $games->links() !!}
+    </div>
 @endsection

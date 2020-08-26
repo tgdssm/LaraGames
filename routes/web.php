@@ -13,12 +13,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::any('game/search', 'GameController@search')->name('game.search');
+
 Route::get('/', function () {
     return redirect()->route('game.index');
 });
 
 Route::resource('game', 'GameController');
 
-Auth::routes();
+Auth::routes(['register'=>false]);
 
 Route::get('/home', 'HomeController@index')->name('home');
