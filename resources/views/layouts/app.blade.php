@@ -92,7 +92,7 @@
                     <form action="{{ route('game.search') }}" method="POST" class="form form-inline ml-3">
                         @csrf
                         <input type="text" name="filter" placeholder="Procurar Jogo" class="form-control">
-                        <button type="submit" class="btn btn-outline-primary ml-1">Pesquisar</button>
+                        <button type="submit" class="btn btn-outline-primary ml-1">Pesquisar</i></button>
                     </form>
                 </div>
             </div>

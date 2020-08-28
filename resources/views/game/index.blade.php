@@ -1,5 +1,20 @@
 @extends('layouts.app')
 @section('content')
+{{-- <div class="card float-right mr-4" style="width: 18rem;">
+    <div class="card-header">
+      <h3>Mais Recentes</h3>
+    </div>
+    <ul class="list-group list-group-flush">
+        @forelse ($games as $game)
+        
+      <li class="list-group-item"><a href="{{ route('game.show', $game->id) }}" class="text-dark">{{ $game->name }}</a></li>
+            
+        @empty
+            
+        @endforelse
+    </ul>
+  </div> --}}
+
     @forelse ($games as $game)
     <div class="container col-md-6">
         <div class="card-group vgr-cards">
@@ -23,6 +38,10 @@
     </div>
     @endforelse
     <div class="container d-flex justify-content-center align-items-center">
-        {!! $games->links() !!}
+        @if (isset($filters))
+            {!! $games->appends($filters)->links() !!}
+        @else 
+            {!! $games->links() !!}
+        @endif
     </div>
 @endsection

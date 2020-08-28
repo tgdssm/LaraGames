@@ -15,8 +15,10 @@ use DB;
 
 class GameController extends Controller
 {
-    public function __construct()
+    private $repository;
+    public function __construct(Game $games)
     {
+        $this->repository = $games;
         $this->middleware('recommendation');
         $this->middleware('auth')->except('index', 'show', 'search');
     }
@@ -27,7 +29,7 @@ class GameController extends Controller
      */
     public function index()
     {
-        $games = Game::paginate(3);
+        $games = $this->repository->paginate(3);
         return view('game.index', compact('games'));
     }
 
@@ -50,20 +52,13 @@ class GameController extends Controller
      */
     public function store(GameRequest $request)
     {
-        $game = new Game;
-        $game->name = $request->name;
-        $game->release = $request->release;
-        $game->description = $request->description;
-        $game->genre = $request->genre;
-        $game->language = $request->language;
-        $game->platform = $request->platform;
-        $game->size = $request->size;
+        $data = $request->except('photo', 'torrent');
         if($request->hasFile('photo'))
-            $game->photo = $request->photo->store('public');
-        
+            $data['photo'] = $request->photo->store('public');
         if($request->hasFile('torrent'))
-            $game->torrent = $request->torrent->store('public');
-        $game->save();
+            $data['torrent'] = $request->torrent->store('public');
+        
+        $this->repository->create($data);
 
         return redirect()->route('game.index');
     }
@@ -76,7 +71,7 @@ class GameController extends Controller
      */
     public function show($id)
     {
-        $game = Game::findOrFail($id);
+        $game = $this->repository->findOrFail($id);
         return view('game.show', compact('game'));
     }
 
@@ -88,7 +83,7 @@ class GameController extends Controller
      */
     public function edit($id)
     {
-        $game = Game::findOrFail($id);
+        $game = $this->repository->findOrFail($id);
         $this->authorize('administrator', User::class);
         return view('game.edit', compact('game'));
     }
@@ -102,24 +97,16 @@ class GameController extends Controller
      */
     public function update(UpdateGameRequest $request, $id)
     {
-        $game = Game::find($id);
+        $game = $this->repository->find($id);
         $this->authorize('administrator', User::class);
 
-        $game->name = $request->name;
-        $game->release = $request->release;
-        $game->description = $request->description;
-        $game->genre = $request->genre;
-        $game->language = $request->language;
-        $game->platform = $request->platform;
-        $game->size = $request->size;
-
+        $data = $request->except('photo', 'torrent');
         if($request->hasFile('photo'))
-            $game->photo = $request->photo->store('public');
-        
+            $data['photo'] = $request->photo->store('public');
         if($request->hasFile('torrent'))
-            $game->torrent = $request->torrent->store('public');
+            $data['torrent'] = $request->torrent->store('public');
 
-        $game->save();
+        $game->update($data);
 
         return redirect()->route('game.index');
     }
@@ -132,7 +119,7 @@ class GameController extends Controller
      */
     public function destroy($id)
     {
-        $game = Game::find($id);
+        $game = $this->repository->find($id);
         $this->authorize('administrator', User::class);
 
         if ($game->delete())
@@ -141,9 +128,10 @@ class GameController extends Controller
 
     public function search(Request $request)
     {
-        
-
-        $games = DB::table('games')->where('name', 'LIKE', "%{$request->filter}%")->paginate();
-        return view('game.index', compact('games'));
+        $filters = $request->except('_token');
+        $games = $this->repository->search($request->filter);
+        return view('game.index', compact('games', 'filters'));
     }
+
+
 }

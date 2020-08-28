@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::any('game/search', 'GameController@search')->name('game.search');
 
+// Route::get('game/recent', 'GameController@recent')->name('game.recent');
+
 Route::get('/', function () {
     return redirect()->route('game.index');
 });
